@@ -1,0 +1,35 @@
+services:
+  feedbackservice:
+    build:
+      context: ./FeedbackService
+      dockerfile: Dockerfile
+    container_name: feedbackservice
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__FeedbackDatabase: Host=postgres;Port=5432;Database=feedbackdb_dev;Username=postgres;Password=postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: feedback-postgres
+    environment:
+      POSTGRES_DB: feedbackdb_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - feedback-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d feedbackdb_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  feedback-postgres-data:
