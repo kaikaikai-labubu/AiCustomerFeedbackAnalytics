@@ -2,7 +2,7 @@ using FeedbackService.Application.Interfaces;
 using FeedbackService.Application.Models;
 using FeedbackService.Domain.Entities;
 using MassTransit;
-using FeedbackService.Application.Contracts;
+using Shared.Contracts.Events;
 
 namespace FeedbackService.Application.Services;
 

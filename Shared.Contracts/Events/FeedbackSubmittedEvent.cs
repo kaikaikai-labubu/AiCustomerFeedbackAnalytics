@@ -1,4 +1,4 @@
-﻿namespace AnalysisService.Application.Contracts
+﻿namespace Shared.Contracts.Events
 {
     public record FeedbackSubmittedEvent(
         Guid FeedbackId,

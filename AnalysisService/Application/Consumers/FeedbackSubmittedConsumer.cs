@@ -1,4 +1,4 @@
-﻿using AnalysisService.Application.Contracts;
+﻿using Shared.Contracts.Events;
 using MassTransit;
 using AnalysisService.Application.Interfaces;
 using AnalysisService.Domain.Entities;
