@@ -40,9 +40,6 @@ namespace FeedbackService.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
-                    b.Property<int>("Rating")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.ToTable("feedback", (string)null);

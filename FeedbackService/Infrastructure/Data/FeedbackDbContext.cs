@@ -16,8 +16,6 @@ public sealed class FeedbackDbContext(DbContextOptions<FeedbackDbContext> option
         feedback.Property(x => x.CustomerId)
             .IsRequired()
             .HasMaxLength(128);
-        feedback.Property(x => x.Rating)
-            .IsRequired();
         feedback.Property(x => x.Comment)
             .HasMaxLength(4000);
         feedback.Property(x => x.CreatedAtUtc)

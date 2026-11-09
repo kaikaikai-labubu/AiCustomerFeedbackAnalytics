@@ -22,7 +22,6 @@ public sealed class FeedbackAppService(IFeedbackRepository feedbackRepository) :
         {
             Id = Guid.NewGuid(),
             CustomerId = request.CustomerId.Trim(),
-            Rating = request.Rating,
             Comment = string.IsNullOrWhiteSpace(request.Comment) ? null : request.Comment.Trim(),
             CreatedAtUtc = DateTime.UtcNow
         };
