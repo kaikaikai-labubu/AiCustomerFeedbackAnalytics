@@ -24,7 +24,7 @@ public sealed class FeedbackRepository(FeedbackDbContext dbContext) : IFeedbackR
 
     public async Task<Feedback> AddAsync(Feedback feedback, CancellationToken cancellationToken)
     {
-        dbContext.Feedback.Add(feedback);
+        await dbContext.Feedback.AddAsync(feedback, cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
         return feedback;
     }

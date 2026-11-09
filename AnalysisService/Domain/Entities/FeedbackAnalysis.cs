@@ -1,4 +1,6 @@
-﻿namespace AnalysisService.Domain.Entities
+﻿using AnalysisService.Domain.Enum;
+
+namespace AnalysisService.Domain.Entities
 {
     public class FeedbackAnalysis
     {
@@ -11,5 +13,7 @@
         public string Summary { get; set; } = string.Empty;
 
         public DateTime CreatedAtUtc { get; set; }
+
+        public PriorityType Priority { get; set; }
     }
 }
