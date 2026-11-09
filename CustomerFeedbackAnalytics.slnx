@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FeedbackService/FeedbackService.csproj" />
+  <Project Path="AnalysisService/AnalysisService.csproj" />
 </Solution>
