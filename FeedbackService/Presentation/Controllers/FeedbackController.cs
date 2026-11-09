@@ -35,11 +35,6 @@ public sealed class FeedbackController(IFeedbackService feedbackService) : Contr
             return BadRequest("CustomerId is required.");
         }
 
-        if (request.Rating is < 1 or > 5)
-        {
-            return BadRequest("Rating must be between 1 and 5.");
-        }
-
         var created = await feedbackService.CreateAsync(request, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
