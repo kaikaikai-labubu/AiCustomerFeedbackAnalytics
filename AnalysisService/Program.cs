@@ -1,5 +1,6 @@
-using AnalysisService.Application.Interfaces;
 using AnalysisService.Application.Consumers;
+using AnalysisService.Application.Interfaces;
+using AnalysisService.Infrastructure.AI;
 using AnalysisService.Infrastructure.Data;
 using AnalysisService.Infrastructure.Repositories;
 using MassTransit;
@@ -38,6 +39,11 @@ builder.Services.AddMassTransit(x =>
         cfg.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.Configure<AzureOpenAiOptions>(
+    builder.Configuration.GetSection("AzureOpenAI"));
+
+builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
 
 var app = builder.Build();
 
