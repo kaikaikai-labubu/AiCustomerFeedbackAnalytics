@@ -10,17 +10,19 @@ namespace AnalysisService.Application.Consumers
     {
         private readonly ILogger<FeedbackSubmittedConsumer> _logger;
         private readonly IAnalysisRepository _analysisRepository;
-
         private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ISentimentAnalysisService _sentimentAnalysisService;
 
         public FeedbackSubmittedConsumer(
             ILogger<FeedbackSubmittedConsumer> logger,
             IAnalysisRepository analysisRepository,
-            IPublishEndpoint publishEndpoint)
+            IPublishEndpoint publishEndpoint,
+            ISentimentAnalysisService sentimentAnalysisService)
         {
             _logger = logger;
             _analysisRepository = analysisRepository;
             _publishEndpoint = publishEndpoint;
+            _sentimentAnalysisService = sentimentAnalysisService;
         }
 
         public async Task Consume(
@@ -30,12 +32,14 @@ namespace AnalysisService.Application.Consumers
                 "Feedback received: {FeedbackId}",
                 context.Message.FeedbackId);
 
+            var sentimentResult = await _sentimentAnalysisService.AnalyzeAsync(context.Message.Comment);
+
             var analysis = new FeedbackAnalysis
             {
                 FeedbackId = context.Message.FeedbackId,
                 CreatedAtUtc = DateTime.UtcNow,
                 Summary = context.Message.Comment,
-                Sentiment = "Unknown",
+                Sentiment = sentimentResult.Sentiment,
                 Priority = Domain.Enum.PriorityType.Normal,
 
             };

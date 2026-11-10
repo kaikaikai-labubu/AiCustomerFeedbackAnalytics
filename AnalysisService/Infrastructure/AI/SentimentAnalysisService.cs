@@ -11,7 +11,7 @@ namespace AnalysisService.Infrastructure.AI
     public class SentimentAnalysisService : ISentimentAnalysisService
     {
         private readonly AzureOpenAiOptions _options;
-        private readonly Logger<SentimentAnalysisService> _logger;
+        private readonly ILogger<SentimentAnalysisService> _logger;
 
         public SentimentAnalysisService(
             IOptions<AzureOpenAiOptions> options, ILogger<SentimentAnalysisService> logger)
