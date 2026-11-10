@@ -12,10 +12,11 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["FeedbackService.csproj", "."]
-RUN dotnet restore "./FeedbackService.csproj"
+COPY ["FeedbackService/FeedbackService.csproj", "FeedbackService/"]
+COPY ["Shared.Contracts/Shared.Contracts.csproj", "Shared.Contracts/"]
+RUN dotnet restore "./FeedbackService/FeedbackService.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/FeedbackService"
 RUN dotnet build "./FeedbackService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage

@@ -1,42 +1,108 @@
 services:
+
   feedbackservice:
     build:
-      context: ./FeedbackService
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: FeedbackService/Dockerfile
     container_name: feedbackservice
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: 8080
-      ConnectionStrings__FeedbackDatabase: Host=postgres;Port=5432;Database=feedbackdb_dev;Username=postgres;Password=postgres
+
+      ConnectionStrings__FeedbackDatabase: Host=feedback-postgres;Port=5432;Database=feedbackdb_dev;Username=postgres;Password=postgres
+
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+
     ports:
       - "8080:8080"
+
     depends_on:
-      postgres:
+      feedback-postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  analysisservice:
+    build:
+      context: .
+      dockerfile: AnalysisService/Dockerfile
+    container_name: analysisservice
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+
+      ConnectionStrings__AnalysisDatabase: Host=analysis-postgres;Port=5432;Database=analysisdb_dev;Username=postgres;Password=postgres
+
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: guest
+      RabbitMq__Password: guest
+
+    ports:
+      - "8081:8080"
+
+    depends_on:
+      analysis-postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
 
   rabbitmq:
-    image: rabbitmq:4-management
+    image: rabbitmq:4.4-management
+    container_name: rabbitmq
     hostname: rabbitmq
+
     ports:
       - "5672:5672"
       - "15672:15672"
 
-  postgres:
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  feedback-postgres:
     image: postgres:16-alpine
     container_name: feedback-postgres
+
     environment:
       POSTGRES_DB: feedbackdb_dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
     ports:
       - "5432:5432"
+
     volumes:
       - feedback-postgres-data:/var/lib/postgresql/data
+
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d feedbackdb_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  analysis-postgres:
+    image: postgres:16-alpine
+    container_name: analysis-postgres
+
+    environment:
+      POSTGRES_DB: analysisdb_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - analysis-postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d analysisdb_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   feedback-postgres-data:
+  analysis-postgres-data:
+  rabbitmq-data:
