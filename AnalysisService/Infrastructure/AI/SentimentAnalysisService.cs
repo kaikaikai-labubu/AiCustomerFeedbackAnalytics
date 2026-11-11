@@ -5,6 +5,7 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace AnalysisService.Infrastructure.AI
 {
@@ -76,7 +77,8 @@ namespace AnalysisService.Infrastructure.AI
                 response,
                 new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter() }
                 });
 
             if (sentimentResult is null)
