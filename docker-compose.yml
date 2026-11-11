@@ -39,6 +39,10 @@ services:
       RabbitMq__Username: guest
       RabbitMq__Password: guest
 
+      AzureOpenAI__Endpoint: ${AZURE_OPENAI_ENDPOINT}
+      AzureOpenAI__ApiKey: ${AZURE_OPENAI_API_KEY}
+      AzureOpenAI__DeploymentName: ${AZURE_OPENAI_DEPLOYMENT_NAME}
+
     ports:
       - "8081:8080"
 

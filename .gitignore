@@ -260,7 +260,7 @@ UpgradeLog*.XML
 UpgradeLog*.htm
 
 # Local environment settings
-**/appsettings.Development.json
+.env
 ServiceFabricBackup/
 *.rptproj.bak
 

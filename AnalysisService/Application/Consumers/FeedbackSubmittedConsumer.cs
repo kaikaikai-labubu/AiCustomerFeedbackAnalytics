@@ -40,8 +40,7 @@ namespace AnalysisService.Application.Consumers
                 CreatedAtUtc = DateTime.UtcNow,
                 Summary = context.Message.Comment,
                 Sentiment = sentimentResult.Sentiment,
-                Priority = Domain.Enum.PriorityType.Normal,
-
+                Priority = sentimentResult.Priority
             };
 
             await _analysisRepository.AddAsync(

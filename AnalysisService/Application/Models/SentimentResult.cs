@@ -1,9 +1,12 @@
-﻿namespace AnalysisService.Application.Models
+﻿using AnalysisService.Domain.Enum;
+
+namespace AnalysisService.Application.Models
 {
     public record SentimentResult(
         string Sentiment,
         double Confidence,
         string PrimaryTopic,
-        string Reason
+        string Reason,
+        PriorityType Priority
     );
 }
