@@ -40,7 +40,10 @@ namespace AnalysisService.Application.Consumers
                 CreatedAtUtc = DateTime.UtcNow,
                 Summary = context.Message.Comment,
                 Sentiment = sentimentResult.Sentiment,
-                Priority = sentimentResult.Priority
+                Priority = sentimentResult.Priority,
+                Confidence = sentimentResult.Confidence,
+                PrimaryTopic = sentimentResult.PrimaryTopic,
+                Reason = sentimentResult.Reason
             };
 
             await _analysisRepository.AddAsync(
@@ -52,7 +55,11 @@ namespace AnalysisService.Application.Consumers
                     analysis.FeedbackId,
                     analysis.Sentiment,
                     analysis.Summary,
-                    DateTime.UtcNow));
+                    DateTime.UtcNow,
+                    analysis.Reason,
+                    analysis.PrimaryTopic,
+                    analysis.Confidence,
+                    analysis.Priority.ToString()));
         }
     }
 }

@@ -4,6 +4,10 @@
     Guid FeedbackId,
     string Sentiment,
     string Summary,
-    DateTime AnalysedAtUtc);
+    DateTime AnalysedAtUtc,
+    string Reason,
+    string PrimaryTopic,
+    double Confidence,
+    string Priority);
 
 }
