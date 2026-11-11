@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers();
+
 builder.Services.AddDbContext<AnalysisDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AnalysisDatabase")));
 
@@ -16,6 +18,7 @@ builder.Services.AddScoped<IAnalysisRepository, AnalysisRepository>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -50,19 +53,6 @@ var app = builder.Build();
 var azureOpenAiEndpoint = builder.Configuration["AzureOpenAI:Endpoint"];
 var azureOpenAiDeployment = builder.Configuration["AzureOpenAI:DeploymentName"];
 
-if (string.IsNullOrWhiteSpace(azureOpenAiEndpoint) || string.IsNullOrWhiteSpace(azureOpenAiDeployment))
-{
-    app.Logger.LogWarning("AzureOpenAI configuration is incomplete. Endpoint or DeploymentName is missing.");
-}
-else
-{
-    var endpointHost = Uri.TryCreate(azureOpenAiEndpoint, UriKind.Absolute, out var endpointUri)
-        ? endpointUri.Host
-        : "invalid-uri";
-
-    app.Logger.LogInformation("AzureOpenAI configured. EndpointHost: {EndpointHost}, DeploymentName: {DeploymentName}", endpointHost, azureOpenAiDeployment);
-}
-
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AnalysisDbContext>();
@@ -77,5 +67,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
