@@ -28,14 +28,27 @@ namespace AnalysisService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<double>("Confidence")
+                        .HasColumnType("double precision");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("FeedbackId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("PrimaryTopic")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<int>("Priority")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.Property<string>("Sentiment")
                         .IsRequired()

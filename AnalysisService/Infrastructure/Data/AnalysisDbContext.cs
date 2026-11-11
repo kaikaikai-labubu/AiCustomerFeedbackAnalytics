@@ -19,7 +19,18 @@ namespace AnalysisService.Infrastructure.Data
                 .IsRequired()
                 .HasMaxLength(128);
             feedback.Property(x => x.Summary)
+                .IsRequired()
                 .HasMaxLength(4000);
+            feedback.Property(x => x.Confidence)
+                .IsRequired();
+            feedback.Property(x => x.PrimaryTopic)
+                .IsRequired()
+                .HasMaxLength(256);
+            feedback.Property(x => x.Reason)
+                .IsRequired()
+                .HasMaxLength(512);
+            feedback.Property(x => x.Priority)
+                .IsRequired();
             feedback.Property(x => x.CreatedAtUtc)
                 .IsRequired();
         }
