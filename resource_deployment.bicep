@@ -9,7 +9,7 @@ param location string = resourceGroup().location
 /*
   An AI Foundry resources is a variant of a CognitiveServices/account resource type
 */ 
-resource aiFoundry 'Microsoft.CognitiveServices/accounts@2026-09-01' = {
+resource aiFoundry 'Microsoft.CognitiveServices/accounts@2026-05-01' = {
   name: aiFoundryName
   location: location
   identity: {
@@ -26,6 +26,9 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2026-09-01' = {
     // Defines developer API endpoint subdomain
     customSubDomainName: aiFoundryName
 
+    // Explicitly required by this API version
+    publicNetworkAccess: 'Enabled'
+
     disableLocalAuth: false
   }
 }
@@ -35,9 +38,12 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2026-09-01' = {
   Its advisable to create one project right away, so development teams can directly get started.
   Projects may be granted individual RBAC permissions and identities on top of what account provides.
 */
-resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2026-09-01' = {
+resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2026-05-01' = {
   name: aiProjectName
   parent: aiFoundry
+  dependsOn: [
+    embeddingModelDeployment
+  ]
   location: location
   identity: {
     type: 'SystemAssigned'
@@ -51,7 +57,7 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2026-09-01' = 
   which is a variant of GPT-5 optimized for lower latency and 
   cost while still providing strong performance for many use cases.
 */
-resource llmModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2026-09-01'= {
+resource llmModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01'= {
   parent: aiFoundry
   name: llmModelDeploymentName
   sku : {
@@ -60,15 +66,15 @@ resource llmModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@20
   }
   properties: {
     model:{
-      name: 'gpt-5-mini'
+      name: 'gpt-4o'
       format: 'OpenAI'
-      version: '2025-08-07'
+      version: '2024-11-20'
     }
   }
 }
 
 // https://ai.azure.com/catalog/models/text-embedding-3-small
-resource embeddingModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2026-09-01'= {
+resource embeddingModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01'= {
   parent: aiFoundry
   name: embeddingModelDeploymentName
   dependsOn: [
@@ -87,7 +93,7 @@ resource embeddingModelDeployment 'Microsoft.CognitiveServices/accounts/deployme
   }
 }
 
-resource searchService 'Microsoft.Search/searchServices@2025-09-01' = {
+resource searchService 'Microsoft.Search/searchServices@2025-05-01' = {
   name: aiSearchName
   location: location
   sku: {
@@ -96,7 +102,8 @@ resource searchService 'Microsoft.Search/searchServices@2025-09-01' = {
   properties: {
     replicaCount: 1
     partitionCount: 1
-    hostingMode: 'default'
+    hostingMode: 'Default'
+    publicNetworkAccess: 'enabled'
     disableLocalAuth: true
   }
 }

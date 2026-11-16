@@ -8,10 +8,10 @@ az group create `
 az deployment group create `
 --resource-group $resourceGroup `
 --template-file resource_deployment.bicep `
---parameters projectPrefix=ai-customer-feedback
+--parameters projectPrefix=ai-customer-feedback-kai
 
 # Get your deployment outputs
 az deployment group show `
---resource-group aiagent-course-rg `
+--resource-group $resourceGroup `
 --name resource_deployment `
 --query properties.outputs
