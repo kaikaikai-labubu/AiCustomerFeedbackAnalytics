@@ -1,0 +1,152 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.49.2.45890",
+      "templateHash": "14602737289723377820"
+    }
+  },
+  "parameters": {
+    "projectPrefix": {
+      "type": "string"
+    },
+    "aiFoundryName": {
+      "type": "string",
+      "defaultValue": "[parameters('projectPrefix')]"
+    },
+    "aiProjectName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-proj', parameters('aiFoundryName'))]"
+    },
+    "llmModelDeploymentName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-llm-deploy', parameters('projectPrefix'))]"
+    },
+    "embeddingModelDeploymentName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-embedding-deploy', parameters('projectPrefix'))]"
+    },
+    "aiSearchName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-aisearch', parameters('projectPrefix'))]"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2026-05-01",
+      "name": "[parameters('aiFoundryName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "sku": {
+        "name": "S0"
+      },
+      "kind": "AIServices",
+      "properties": {
+        "allowProjectManagement": true,
+        "customSubDomainName": "[parameters('aiFoundryName')]",
+        "publicNetworkAccess": "Enabled",
+        "disableLocalAuth": false
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/projects",
+      "apiVersion": "2026-05-01",
+      "name": "[format('{0}/{1}', parameters('aiFoundryName'), parameters('aiProjectName'))]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {},
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('aiFoundryName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts/deployments', parameters('aiFoundryName'), parameters('embeddingModelDeploymentName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2026-05-01",
+      "name": "[format('{0}/{1}', parameters('aiFoundryName'), parameters('llmModelDeploymentName'))]",
+      "sku": {
+        "capacity": 10,
+        "name": "GlobalStandard"
+      },
+      "properties": {
+        "model": {
+          "name": "gpt-4o",
+          "format": "OpenAI",
+          "version": "2024-11-20"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('aiFoundryName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2026-05-01",
+      "name": "[format('{0}/{1}', parameters('aiFoundryName'), parameters('embeddingModelDeploymentName'))]",
+      "sku": {
+        "capacity": 1,
+        "name": "GlobalStandard"
+      },
+      "properties": {
+        "model": {
+          "name": "text-embedding-3-small",
+          "format": "OpenAI",
+          "version": "1"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('aiFoundryName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts/deployments', parameters('aiFoundryName'), parameters('llmModelDeploymentName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Search/searchServices",
+      "apiVersion": "2025-05-01",
+      "name": "[parameters('aiSearchName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "standard"
+      },
+      "properties": {
+        "replicaCount": 1,
+        "partitionCount": 1,
+        "hostingMode": "Default",
+        "publicNetworkAccess": "enabled",
+        "disableLocalAuth": true
+      }
+    }
+  ],
+  "outputs": {
+    "project_endpoint": {
+      "type": "string",
+      "value": "[format('https://{0}.services.ai.azure.com/api/projects/{1}', reference(resourceId('Microsoft.CognitiveServices/accounts', parameters('aiFoundryName')), '2026-05-01').customSubDomainName, parameters('aiProjectName'))]"
+    },
+    "llm_model_deployment_name": {
+      "type": "string",
+      "value": "[parameters('llmModelDeploymentName')]"
+    },
+    "embedding_model_deployment_name": {
+      "type": "string",
+      "value": "[parameters('embeddingModelDeploymentName')]"
+    },
+    "AI_SEARCH_SERVICE_ENDPOINT": {
+      "type": "string",
+      "value": "[format('https://{0}.search.windows.net', parameters('aiSearchName'))]"
+    },
+    "AI_SEARCH_SERVICE_DEPLOYMENT_NAME": {
+      "type": "string",
+      "value": "[parameters('aiSearchName')]"
+    }
+  }
+}
