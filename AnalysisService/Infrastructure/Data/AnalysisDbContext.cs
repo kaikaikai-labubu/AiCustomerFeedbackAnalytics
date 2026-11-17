@@ -31,6 +31,10 @@ namespace AnalysisService.Infrastructure.Data
                 .HasMaxLength(512);
             feedback.Property(x => x.Priority)
                 .IsRequired();
+            feedback.Property(x => x.Embedding)
+                .HasConversion(
+                    value => value.ToArray(),
+                    value => new ReadOnlyMemory<float>(value ?? Array.Empty<float>()));
             feedback.Property(x => x.CreatedAtUtc)
                 .IsRequired();
         }
