@@ -34,6 +34,10 @@ namespace AnalysisService.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<float[]>("Embedding")
+                        .IsRequired()
+                        .HasColumnType("real[]");
+
                     b.Property<Guid>("FeedbackId")
                         .HasColumnType("uuid");
 

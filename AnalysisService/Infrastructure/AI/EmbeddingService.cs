@@ -8,7 +8,6 @@ namespace AnalysisService.Infrastructure.AI
 {
     public sealed class EmbeddingService : IEmbeddingService
     {
-        private const string EmbeddingModel = "text-embedding-3-small";
         private readonly AzureOpenAiOptions _options;
 
         public EmbeddingService(IOptions<AzureOpenAiOptions> options)
@@ -30,7 +29,16 @@ namespace AnalysisService.Infrastructure.AI
                     Endpoint = new Uri(_options.Endpoint)
                 });
 
-            EmbeddingClient embeddingClient = client.GetEmbeddingClient(EmbeddingModel);
+            var embeddingDeploymentName = string.IsNullOrWhiteSpace(_options.EmbeddingDeploymentName)
+                ? _options.DeploymentName
+                : _options.EmbeddingDeploymentName;
+
+            if (string.IsNullOrWhiteSpace(embeddingDeploymentName))
+            {
+                throw new InvalidOperationException("AzureOpenAI:EmbeddingDeploymentName is not configured.");
+            }
+
+            EmbeddingClient embeddingClient = client.GetEmbeddingClient(embeddingDeploymentName);
             OpenAIEmbedding embedding = await embeddingClient.GenerateEmbeddingAsync(feedback);
 
             return embedding.ToFloats();
