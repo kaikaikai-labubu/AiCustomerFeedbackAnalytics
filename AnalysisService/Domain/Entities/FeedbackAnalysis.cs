@@ -21,5 +21,7 @@ namespace AnalysisService.Domain.Entities
         public DateTime CreatedAtUtc { get; set; }
 
         public PriorityType Priority { get; set; }
+
+        public ReadOnlyMemory<float> Embedding { get; set; }
     }
 }

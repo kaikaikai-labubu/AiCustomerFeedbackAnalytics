@@ -47,6 +47,7 @@ builder.Services.Configure<AzureOpenAiOptions>(
     builder.Configuration.GetSection("AzureOpenAI"));
 
 builder.Services.AddScoped<ISentimentAnalysisService, SentimentAnalysisService>();
+builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 
 var app = builder.Build();
 

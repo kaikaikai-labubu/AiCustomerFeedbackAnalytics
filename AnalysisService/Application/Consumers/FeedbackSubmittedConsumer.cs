@@ -13,16 +13,20 @@ namespace AnalysisService.Application.Consumers
         private readonly IPublishEndpoint _publishEndpoint;
         private readonly ISentimentAnalysisService _sentimentAnalysisService;
 
+        private readonly IEmbeddingService _embeddingService;
+
         public FeedbackSubmittedConsumer(
             ILogger<FeedbackSubmittedConsumer> logger,
             IAnalysisRepository analysisRepository,
             IPublishEndpoint publishEndpoint,
-            ISentimentAnalysisService sentimentAnalysisService)
+            ISentimentAnalysisService sentimentAnalysisService,
+            IEmbeddingService embeddingService)
         {
             _logger = logger;
             _analysisRepository = analysisRepository;
             _publishEndpoint = publishEndpoint;
             _sentimentAnalysisService = sentimentAnalysisService;
+            _embeddingService = embeddingService;
         }
 
         public async Task Consume(
@@ -43,23 +47,24 @@ namespace AnalysisService.Application.Consumers
                 Priority = sentimentResult.Priority,
                 Confidence = sentimentResult.Confidence,
                 PrimaryTopic = sentimentResult.PrimaryTopic,
-                Reason = sentimentResult.Reason
+                Reason = sentimentResult.Reason,
+                Embedding = _embeddingService.GetEmbeddingAsync(context.Message.Comment).Result
             };
 
             await _analysisRepository.AddAsync(
                 analysis,
                 context.CancellationToken);
 
-            await _publishEndpoint.Publish(
-                new FeedbackAnalysedEvent(
-                    analysis.FeedbackId,
-                    analysis.Sentiment,
-                    analysis.Summary,
-                    DateTime.UtcNow,
-                    analysis.Reason,
-                    analysis.PrimaryTopic,
-                    analysis.Confidence,
-                    analysis.Priority.ToString()));
+            //await _publishEndpoint.Publish(
+            //    new FeedbackAnalysedEvent(
+            //        analysis.FeedbackId,
+            //        analysis.Sentiment,
+            //        analysis.Summary,
+            //        DateTime.UtcNow,
+            //        analysis.Reason,
+            //        analysis.PrimaryTopic,
+            //        analysis.Confidence,
+            //        analysis.Priority.ToString()));
         }
     }
 }
