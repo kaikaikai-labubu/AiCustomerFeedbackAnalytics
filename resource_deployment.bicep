@@ -53,9 +53,6 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2026-05-01' = 
 
 /*
   Deploying a model to the AI Foundry is done through a deployment resource.
-  In this example, we are deploying the 'gpt-5-mini' model, 
-  which is a variant of GPT-5 optimized for lower latency and 
-  cost while still providing strong performance for many use cases.
 */
 resource llmModelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2026-05-01'= {
   parent: aiFoundry
