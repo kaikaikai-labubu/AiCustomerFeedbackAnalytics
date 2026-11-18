@@ -51,6 +51,16 @@ namespace AnalysisService.Application.Consumers
                 Embedding = _embeddingService.GetEmbeddingAsync(context.Message.Comment).Result
             };
 
+            _logger.LogInformation(
+                "Feedback analysis completed: {FeedbackId}, Sentiment: {Sentiment}, Confidence: {Confidence}, PrimaryTopic: {PrimaryTopic}, Reason: {Reason}, Priority: {Priority}, Embedding: {Embedding}",
+                analysis.FeedbackId,
+                analysis.Sentiment,
+                analysis.Confidence,
+                analysis.PrimaryTopic,
+                analysis.Reason,
+                analysis.Priority,
+                analysis.Embedding);
+
             await _analysisRepository.AddAsync(
                 analysis,
                 context.CancellationToken);

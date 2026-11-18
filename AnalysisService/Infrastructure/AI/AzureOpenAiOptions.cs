@@ -6,5 +6,7 @@
         public string ApiKey { get; set; } = string.Empty;
         public string DeploymentName { get; set; } = string.Empty;
         public string EmbeddingDeploymentName { get; set; } = string.Empty;
+        public string AiSearchEndpoint { get; set; } = string.Empty;
+        public string AiSearchApiKey { get; set; } = string.Empty;
     }
 }

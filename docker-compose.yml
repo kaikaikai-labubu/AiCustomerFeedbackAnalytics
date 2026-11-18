@@ -43,6 +43,8 @@ services:
       AzureOpenAI__ApiKey: ${AZURE_OPENAI_API_KEY}
       AzureOpenAI__DeploymentName: ${AZURE_OPENAI_DEPLOYMENT_NAME}
       AzureOpenAI__EmbeddingDeploymentName: ${AZURE_OPENAI_EMBEDDING_DEPLOYMENT_NAME}
+      AzureOpenAI__AiSearchApiKey: ${AZURE_AISEARCH_API_KEY}
+      AzureOpenAI__AiSearchEndpoint: ${AZURE_AISEARCH_ENDPOINT}
 
     ports:
       - "8081:8080"
