@@ -14,19 +14,22 @@ namespace AnalysisService.Application.Consumers
         private readonly ISentimentAnalysisService _sentimentAnalysisService;
 
         private readonly IEmbeddingService _embeddingService;
+        private readonly IFeedbackAnalysisSearchService _feedbackAnalysisSearchService;
 
         public FeedbackSubmittedConsumer(
             ILogger<FeedbackSubmittedConsumer> logger,
             IAnalysisRepository analysisRepository,
             IPublishEndpoint publishEndpoint,
             ISentimentAnalysisService sentimentAnalysisService,
-            IEmbeddingService embeddingService)
+            IEmbeddingService embeddingService,
+            IFeedbackAnalysisSearchService feedbackAnalysisSearchService)
         {
             _logger = logger;
             _analysisRepository = analysisRepository;
             _publishEndpoint = publishEndpoint;
             _sentimentAnalysisService = sentimentAnalysisService;
             _embeddingService = embeddingService;
+            _feedbackAnalysisSearchService = feedbackAnalysisSearchService;
         }
 
         public async Task Consume(
@@ -38,6 +41,8 @@ namespace AnalysisService.Application.Consumers
 
             var sentimentResult = await _sentimentAnalysisService.AnalyzeAsync(context.Message.Comment);
 
+            var embedding = await _embeddingService.GetEmbeddingAsync(context.Message.Comment);
+
             var analysis = new FeedbackAnalysis
             {
                 FeedbackId = context.Message.FeedbackId,
@@ -48,7 +53,7 @@ namespace AnalysisService.Application.Consumers
                 Confidence = sentimentResult.Confidence,
                 PrimaryTopic = sentimentResult.PrimaryTopic,
                 Reason = sentimentResult.Reason,
-                Embedding = _embeddingService.GetEmbeddingAsync(context.Message.Comment).Result
+                Embedding = embedding
             };
 
             _logger.LogInformation(
@@ -65,16 +70,34 @@ namespace AnalysisService.Application.Consumers
                 analysis,
                 context.CancellationToken);
 
-            //await _publishEndpoint.Publish(
-            //    new FeedbackAnalysedEvent(
-            //        analysis.FeedbackId,
-            //        analysis.Sentiment,
-            //        analysis.Summary,
-            //        DateTime.UtcNow,
-            //        analysis.Reason,
-            //        analysis.PrimaryTopic,
-            //        analysis.Confidence,
-            //        analysis.Priority.ToString()));
+            var similarFeedbacks = await _feedbackAnalysisSearchService.SearchSimilarAsync(
+                embedding,
+                context.Message.Comment,
+                5,
+                context.CancellationToken);
+
+            _logger.LogInformation(
+                "Top {Count} similar feedbacks found for {FeedbackId}.",
+                similarFeedbacks.Count,
+                analysis.FeedbackId);
+
+            var similarFeedbackPayload = similarFeedbacks
+                .Select(x => new
+                {
+                    x.FeedbackId,
+                    Comment = x.Summary,
+                    x.Score
+                })
+                .ToList();
+
+            _logger.LogInformation(
+                "Similar feedback matches for {FeedbackId}: {@SimilarFeedbacks}",
+                analysis.FeedbackId,
+                similarFeedbackPayload);
+
+            await _feedbackAnalysisSearchService.IndexAsync(
+                analysis,
+                context.CancellationToken);
         }
     }
 }
