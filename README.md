@@ -5,6 +5,4 @@
 ![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A cloud-native AI-powered customer feedback analytics platform built with .NET microservices, event-driven architecture, and Azure OpenAI.
-
-The system allows businesses to submit customer feedback, automatically analyze sentiment using AI, and store insights for reporting and decision-making.
+Analysis Service consumes FeedbackSubmitted events, performs sentiment analysis and embedding generation with Azure OpenAI, stores results in PostgreSQL, indexes analyses into Azure AI Search, and runs hybrid similarity search (vector + keyword) to find the top 5 related feedback items. It exposes filter-based analysis retrieval APIs and integrates with RabbitMQ via MassTransit.
